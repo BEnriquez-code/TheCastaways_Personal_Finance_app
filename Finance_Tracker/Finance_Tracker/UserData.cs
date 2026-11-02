@@ -27,9 +27,26 @@ namespace Finance_Tracker
             JsonArray users = ReadUsers();
             JsonNode? node = FindUser(users, user.UserName);
             if (node == null) return false;
-
-            node["Goals"] = JsonSerializer.Serialize(user.Goals);
+            node["Goals"] = JsonSerializer.SerializeToNode(user.Goals);
             WriteUsers(users);
+            return true;
+        }
+
+        public bool RemoveGoal(User user, string goal)
+        {
+            JsonArray users = ReadUsers();
+            JsonNode? node = FindUser(users, user.UserName);
+            if (node == null) return false;
+
+            JsonArray? goalsArray = node["Goals"] as JsonArray;
+            if (goalsArray == null) return false;
+
+            JsonNode? goalNode = goalsArray.FirstOrDefault(g => g?.GetValue<string>() == goal);
+            if (goalNode == null) return false;
+
+            goalsArray.Remove(goalNode);
+            WriteUsers(users);
+            user.Goals.RemoveAll(g => g == goal);
             return true;
         }
 
