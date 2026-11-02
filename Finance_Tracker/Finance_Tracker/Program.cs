@@ -53,7 +53,7 @@ namespace Finance_Tracker
         }
 
         private static void FinancialTrackerLoop(User user, UserData userDataService) {
-            string[] options = ["Create New Account", "View Accounts", "View Goals", "Set New Goal"];
+            string[] options = ["Create New Account", "View Accounts", "View Goals", "Set New Goal", "Remove Goal"];
             bool logout = false;
             do {
                 Console.WriteLine($"\n\nWelcome, {user.UserName}\n\n");
@@ -69,8 +69,13 @@ namespace Finance_Tracker
                         ViewAccounts(user);
                         break;
                     case 3:
+                        ViewGoals(user.Goals);
                         break;
                     case 4:
+                        PromptAddGoal(user);
+                        break;
+                    case 5:
+                        RemoveGoal(user);
                         break;
                     case 0:
                         logout = true;
@@ -269,9 +274,26 @@ namespace Finance_Tracker
         private static void PromptAddGoal(User user)
         {
             string goal = CIO.PromptForString("What goal do you want to accomplish?: ", false);
-            user.Goals.Add(goal);
-            Console.WriteLine($"Added {goal} to your list of {user.Goals}");
 
+            Manager manager = new Manager(new UserData());
+            manager.AddGoal(user, goal);
+            Console.WriteLine($"Added ({goal}) to your list of goals");
+
+        }
+
+        private static void RemoveGoal(User user)
+        {
+            if(user.Goals == null || user.Goals.Count == 0)
+            {
+                Console.WriteLine("You have no goals to remove.");
+                return;
+            }
+
+            Console.WriteLine("Which goal do you want to remove?");
+            int goalIndex = CIO.PromptForMenuSelection(user.Goals, false);
+
+            Manager manager = new Manager(new UserData());
+            manager.RemoveGoal(user, user.Goals[goalIndex - 1]);
         }
 
         private static void ViewGoals(List<string> goals) {
