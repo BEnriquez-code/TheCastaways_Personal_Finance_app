@@ -45,14 +45,14 @@ namespace Finance_Tracker
                 }
 
                 if (user != null) {
-                    FinancialTrackerLoop(user);
+                    FinancialTrackerLoop(user, userDataService);
                     user = null;
                 }
 
             } while (!exit);
         }
 
-        private static void FinancialTrackerLoop(User user) {
+        private static void FinancialTrackerLoop(User user, UserData userDataService) {
             string[] options = ["Create New Account", "View Accounts", "View Goals", "Set New Goal"];
             bool logout = false;
             do {
@@ -63,6 +63,7 @@ namespace Finance_Tracker
                 switch (option)
                 {
                     case 1:
+                        PromptAccountCreation(user, userDataService);
                         break;
                     case 2:
                         break;
@@ -165,6 +166,34 @@ namespace Finance_Tracker
             } while (user == null);
 
             return user;
+        }
+
+        private static void PromptAccountCreation(User user, UserData userDataService) {
+            Manager manager = new Manager(userDataService);
+            Console.WriteLine("\nAccount Creation:\n");
+
+            string accountName = CIO.PromptForString("Account Name: ", false);
+            decimal balance = CIO.PromptForDecimal("Initial Balance: ", 0, decimal.MaxValue);
+            string? pin = "";
+
+            bool invalidPin = true;
+            do {
+                pin = CIO.PromptForString("Create a Four Digit PIN:", false);
+                invalidPin = pin.Length != 4 || !pin.All(char.IsDigit);
+
+                if (invalidPin) {
+                    Console.WriteLine("PIN is either not four digits long or does not contain all digits\n");
+                }
+
+            } while (invalidPin);
+
+            if (manager.AddAccount(user, accountName, pin!, balance))
+            {
+                Console.WriteLine($"\nAccount \"{accountName}\" was created.\n");
+            }
+            else {
+                Console.WriteLine("\nAccount not created.\n");
+            }
         }
 
         private static void Withdraw(Account account) { 
