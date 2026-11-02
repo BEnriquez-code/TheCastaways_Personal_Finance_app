@@ -7,13 +7,7 @@ namespace Finance_Tracker
     {
         public static void Main(string[] args)
         {
-          //BootUpLoop();
-            User user = new User(2341, "Liliana","Miau");
-            Account account = new Account("Account 1",342342,"3333",1000);
-            Account account2 = new Account("Account 2", 34542, "3333", 1300);
-            user.Accounts.Add(account);
-            user.Accounts.Add(account2);
-            ViewAccount(user);
+          BootUpLoop();
         }
 
         private static void BootUpLoop() {
@@ -72,7 +66,7 @@ namespace Finance_Tracker
                         PromptAccountCreation(user, userDataService);
                         break;
                     case 2:
-                        ViewAccount(user);
+                        ViewAccounts(user);
                         break;
                     case 3:
                         break;
@@ -214,6 +208,7 @@ namespace Finance_Tracker
             }
             Console.WriteLine($"Current balance is: ${account.Balance}");
         }
+
         private static void Deposit(Account account) {
             if (account.TransactionHistory == null)
             {
@@ -270,6 +265,7 @@ namespace Finance_Tracker
 
             Console.WriteLine($"Current balance is: ${account.Balance}");
         }
+
         private static void PromptAddGoal(User user)
         {
             string goal = CIO.PromptForString("What goal do you want to accomplish?: ", false);
@@ -281,7 +277,8 @@ namespace Finance_Tracker
         private static void ViewGoals(List<string> goals) {
             CIO.PrintOutList(goals);
         }
-        private static void ViewAccount(User user)
+
+        private static void ViewAccounts(User user)
         {
             List<Account> accounter = new List<Account>();
             
@@ -309,5 +306,4 @@ namespace Finance_Tracker
             }
         }
     }
-
 }
