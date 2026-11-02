@@ -67,8 +67,10 @@ namespace Finance_Tracker
                     case 2:
                         break;
                     case 3:
+                        ViewGoals(user.Goals);
                         break;
                     case 4:
+                        PromptAddGoal(user);
                         break;
                     case 0:
                         logout = true;
@@ -237,7 +239,9 @@ namespace Finance_Tracker
         private static void PromptAddGoal(User user)
         {
             string goal = CIO.PromptForString("What goal do you want to accomplish?: ", false);
-            user.Goals.Add(goal);
+
+            Manager manager = new Manager(new UserData());
+            manager.AddGoal(user, goal);
             Console.WriteLine($"Added {goal} to your list of {user.Goals}");
 
         }
