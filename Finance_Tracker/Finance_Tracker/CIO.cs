@@ -165,10 +165,10 @@ namespace Finance_Tracker
 
         public static void PrintOutList(IEnumerable<string> list) {
             if (list == null || !list.Any()) {
-                throw new ArgumentException("List can't be null or empty");
+                Console.WriteLine("You have no goals, yet.");
             }
 
-            foreach (string l in list) {
+            foreach (string l in list!) {
                 Console.Write($"{l}\n");
             }
         }

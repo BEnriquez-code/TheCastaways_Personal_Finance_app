@@ -24,8 +24,23 @@ namespace Finance_Tracker
         }
 
         public void AddGoal(User user, string goal) {
-            user.Goals.Add(goal);
+            string trimmedGoal = goal.Trim();
+
+            user.Goals.Add(trimmedGoal);
             _userData.SaveGoals(user);
+        }
+
+        public void RemoveGoal(User user, string goal)
+        {
+            string trimmedGoal = goal.Trim();
+            if (_userData.RemoveGoal(user, trimmedGoal))
+            {
+                Console.WriteLine($"Removed goal: {goal}");
+            }
+            else
+            {
+                Console.WriteLine($"Failed to remove goal: {goal}");
+            }
         }
 
         public bool RemoveAccount(User user, string accountName) {

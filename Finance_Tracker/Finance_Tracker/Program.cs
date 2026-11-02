@@ -45,15 +45,15 @@ namespace Finance_Tracker
                 }
 
                 if (user != null) {
-                    FinancialTrackerLoop(user);
+                    FinancialTrackerLoop(user, userDataService);
                     user = null;
                 }
 
             } while (!exit);
         }
 
-        private static void FinancialTrackerLoop(User user) {
-            string[] options = ["Create New Account", "View Accounts", "View Goals", "Set New Goal"];
+        private static void FinancialTrackerLoop(User user, UserData userDataService) {
+            string[] options = ["Create New Account", "View Accounts", "View Goals", "Set New Goal", "Remove Goal"];
             bool logout = false;
             do {
                 Console.WriteLine($"\n\nWelcome, {user.UserName}\n\n");
@@ -63,12 +63,19 @@ namespace Finance_Tracker
                 switch (option)
                 {
                     case 1:
+                        PromptAccountCreation(user, userDataService);
                         break;
                     case 2:
+                        ViewAccounts(user);
                         break;
                     case 3:
+                        ViewGoals(user.Goals);
                         break;
                     case 4:
+                        PromptAddGoal(user);
+                        break;
+                    case 5:
+                        RemoveGoal(user);
                         break;
                     case 0:
                         logout = true;
@@ -167,6 +174,34 @@ namespace Finance_Tracker
             return user;
         }
 
+        private static void PromptAccountCreation(User user, UserData userDataService) {
+            Manager manager = new Manager(userDataService);
+            Console.WriteLine("\nAccount Creation:\n");
+
+            string accountName = CIO.PromptForString("Account Name: ", false);
+            decimal balance = CIO.PromptForDecimal("Initial Balance: ", 0, decimal.MaxValue);
+            string? pin = "";
+
+            bool invalidPin = true;
+            do {
+                pin = CIO.PromptForString("Create a Four Digit PIN:", false);
+                invalidPin = pin.Length != 4 || !pin.All(char.IsDigit);
+
+                if (invalidPin) {
+                    Console.WriteLine("PIN is either not four digits long or does not contain all digits\n");
+                }
+
+            } while (invalidPin);
+
+            if (manager.AddAccount(user, accountName, pin!, balance))
+            {
+                Console.WriteLine($"\nAccount \"{accountName}\" was created.\n");
+            }
+            else {
+                Console.WriteLine("\nAccount not created.\n");
+            }
+        }
+
         private static void Withdraw(Account account) { 
             if (account.TransactionHistory == null)
             {
@@ -178,6 +213,7 @@ namespace Finance_Tracker
             }
             Console.WriteLine($"Current balance is: ${account.Balance}");
         }
+
         private static void Deposit(Account account) {
             if (account.TransactionHistory == null)
             {
@@ -234,17 +270,62 @@ namespace Finance_Tracker
 
             Console.WriteLine($"Current balance is: ${account.Balance}");
         }
+
         private static void PromptAddGoal(User user)
         {
             string goal = CIO.PromptForString("What goal do you want to accomplish?: ", false);
-            user.Goals.Add(goal);
-            Console.WriteLine($"Added {goal} to your list of {user.Goals}");
 
+            Manager manager = new Manager(new UserData());
+            manager.AddGoal(user, goal);
+            Console.WriteLine($"Added ({goal}) to your list of goals");
+
+        }
+
+        private static void RemoveGoal(User user)
+        {
+            if(user.Goals == null || user.Goals.Count == 0)
+            {
+                Console.WriteLine("You have no goals to remove.");
+                return;
+            }
+
+            Console.WriteLine("Which goal do you want to remove?");
+            int goalIndex = CIO.PromptForMenuSelection(user.Goals, false);
+
+            Manager manager = new Manager(new UserData());
+            manager.RemoveGoal(user, user.Goals[goalIndex - 1]);
         }
 
         private static void ViewGoals(List<string> goals) {
             CIO.PrintOutList(goals);
         }
-    }
 
+        private static void ViewAccounts(User user)
+        {
+            List<Account> accounter = new List<Account>();
+            
+            foreach (Account account in user.Accounts)
+            {
+                //Console.WriteLine($"Account Name:{account.AccountName}\n");
+                accounter.Add(account);  
+
+            }
+            List<string> menuOptions = accounter.Select(a => a.AccountName).ToList();
+            Console.WriteLine("Select an account to view");
+            int option = CIO.PromptForMenuSelection(menuOptions, true);
+            
+            if (option > 0 && option <= accounter.Count)
+            {
+                Account selectedAccount = accounter[option - 1];
+
+                Console.WriteLine($"\nSelected Account Name: {selectedAccount.AccountName}\n");
+                Console.WriteLine($"Selected Account Number: {selectedAccount.AccountNumber}\n");
+                Console.WriteLine($"Selected Account Balance: {selectedAccount.Balance}\n");
+            }
+            else if (option == 0) {
+                Console.WriteLine($"Exiting\n");
+                return;
+            }
+        }
+    }
 }
