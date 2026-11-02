@@ -7,7 +7,13 @@ namespace Finance_Tracker
     {
         public static void Main(string[] args)
         {
-          BootUpLoop();
+          //BootUpLoop();
+            User user = new User(2341, "Liliana","Miau");
+            Account account = new Account("Account 1",342342,"3333",1000);
+            Account account2 = new Account("Account 2", 34542, "3333", 1300);
+            user.Accounts.Add(account);
+            user.Accounts.Add(account2);
+            ViewAccount(user);
         }
 
         private static void BootUpLoop() {
@@ -66,6 +72,7 @@ namespace Finance_Tracker
                         PromptAccountCreation(user, userDataService);
                         break;
                     case 2:
+                        ViewAccount(user);
                         break;
                     case 3:
                         break;
@@ -273,6 +280,33 @@ namespace Finance_Tracker
 
         private static void ViewGoals(List<string> goals) {
             CIO.PrintOutList(goals);
+        }
+        private static void ViewAccount(User user)
+        {
+            List<Account> accounter = new List<Account>();
+            
+            foreach (Account account in user.Accounts)
+            {
+                //Console.WriteLine($"Account Name:{account.AccountName}\n");
+                accounter.Add(account);  
+
+            }
+            List<string> menuOptions = accounter.Select(a => a.AccountName).ToList();
+            Console.WriteLine("Select an account to view");
+            int option = CIO.PromptForMenuSelection(menuOptions, true);
+            
+            if (option > 0 && option <= accounter.Count)
+            {
+                Account selectedAccount = accounter[option - 1];
+
+                Console.WriteLine($"\nSelected Account Name: {selectedAccount.AccountName}\n");
+                Console.WriteLine($"Selected Account Number: {selectedAccount.AccountNumber}\n");
+                Console.WriteLine($"Selected Account Balance: {selectedAccount.Balance}\n");
+            }
+            else if (option == 0) {
+                Console.WriteLine($"Exiting\n");
+                return;
+            }
         }
     }
 
