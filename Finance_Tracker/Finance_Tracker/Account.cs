@@ -30,7 +30,7 @@ namespace Finance_Tracker
                     field = value!;
                 }
             }
-                 }
+        }
 
         public string Pin { get; set; }
 

@@ -8,7 +8,7 @@ namespace Finance_Tracker
         // MAIN LOOP
         public static void Main(string[] args)
         {
-          BootUpLoop();
+            BootUpLoop();
         }
         private static void BootUpLoop() {
             var userDataService = new UserData();

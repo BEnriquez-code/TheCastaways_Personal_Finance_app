@@ -85,16 +85,16 @@ namespace Finance_Tracker
         }
 
         public bool RenameAccount(User user, string oldAccountName, string newAccountName ) {
-           string newName = newAccountName.Trim() ?? "";
-           if (newName.Length == 0) return false;
+            string newName = newAccountName.Trim() ?? "";
+            if (newName.Length == 0) return false;
 
-           Account? account = user.Accounts.FirstOrDefault(a =>
-               string.Equals(a.AccountName, oldAccountName, StringComparison.OrdinalIgnoreCase));
-           if (account == null) return false;
+            Account? account = user.Accounts.FirstOrDefault(a =>
+                string.Equals(a.AccountName, oldAccountName, StringComparison.OrdinalIgnoreCase));
+            if (account == null) return false;
 
             bool nameTaken = user.Accounts.Any(a =>
-                 !ReferenceEquals(a, account) &&
-                 string.Equals(a.AccountName, newName, StringComparison.OrdinalIgnoreCase));
+                !ReferenceEquals(a, account) &&
+                string.Equals(a.AccountName, newName, StringComparison.OrdinalIgnoreCase));
             if (nameTaken) return false;
 
             string previousName = account.AccountName;
