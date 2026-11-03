@@ -5,11 +5,11 @@ namespace Finance_Tracker
 {
     public class Program
     {
+        // MAIN LOOP
         public static void Main(string[] args)
         {
           BootUpLoop();
         }
-
         private static void BootUpLoop() {
             var userDataService = new UserData();
             var auth = new Authentication(userDataService);
@@ -51,7 +51,6 @@ namespace Finance_Tracker
 
             } while (!exit);
         }
-
         private static void FinancialTrackerLoop(User user, UserData userDataService) {
             string[] options = ["Create New Account", "View Accounts", "View Goals", "Set New Goal", "Remove Goal"];
             bool logout = false;
@@ -66,7 +65,7 @@ namespace Finance_Tracker
                         PromptAccountCreation(user, userDataService);
                         break;
                     case 2:
-                        ViewAccounts(user);
+                        SelectAccount(user);
                         break;
                     case 3:
                         ViewGoals(user.Goals);
@@ -85,10 +84,9 @@ namespace Finance_Tracker
             } while (!logout);
         }
 
-        private static int PromptAge() {
-            return CIO.PromptForInt("Insert your age: ", 1, int.MaxValue);
-        }
+        // HELPER METHODS
 
+        // ACCOUNT/USER PROMPTING
         private static void PromptRegistration(int age, Authentication auth, UserData userDataService)
         {
             string username = "";
@@ -141,7 +139,6 @@ namespace Finance_Tracker
 
             Console.WriteLine($"User {username} create: {isUserCreated}");
         }
-
         private static User? PromptLogin(Authentication auth, UserData userDataService)
         {
             string username = "";
@@ -173,7 +170,6 @@ namespace Finance_Tracker
 
             return user;
         }
-
         private static void PromptAccountCreation(User user, UserData userDataService) {
             Manager manager = new Manager(userDataService);
             Console.WriteLine("\nAccount Creation:\n");
@@ -201,7 +197,12 @@ namespace Finance_Tracker
                 Console.WriteLine("\nAccount not created.\n");
             }
         }
+        private static int PromptAge() {
+            return CIO.PromptForInt("Insert your age: ", 1, int.MaxValue);
+        }
 
+
+        // FINANCE HANDLING
         private static void Withdraw(Account account) { 
             if (account.TransactionHistory == null)
             {
@@ -213,7 +214,6 @@ namespace Finance_Tracker
             }
             Console.WriteLine($"Current balance is: ${account.Balance}");
         }
-
         private static void Deposit(Account account) {
             if (account.TransactionHistory == null)
             {
@@ -227,7 +227,6 @@ namespace Finance_Tracker
 
             Console.WriteLine($"Current balance is: ${account.Balance}");
         }
-
         private static void Deposit(Account account, int amount)
         {
             if (account.TransactionHistory == null)
@@ -242,7 +241,6 @@ namespace Finance_Tracker
 
             Console.WriteLine($"Current balance is: ${account.Balance}");
         }
-
         private static void ViewHistory(Account account) {
 
            int choice = CIO.PromptForMenuSelection(["View Full Transaction History", "View Income", "View Expenses"], false);
@@ -271,6 +269,7 @@ namespace Finance_Tracker
             Console.WriteLine($"Current balance is: ${account.Balance}");
         }
 
+        // GOAL PROMPTING
         private static void PromptAddGoal(User user)
         {
             string goal = CIO.PromptForString("What goal do you want to accomplish?: ", false);
@@ -280,7 +279,6 @@ namespace Finance_Tracker
             Console.WriteLine($"Added ({goal}) to your list of goals");
 
         }
-
         private static void RemoveGoal(User user)
         {
             if(user.Goals == null || user.Goals.Count == 0)
@@ -295,36 +293,64 @@ namespace Finance_Tracker
             Manager manager = new Manager(new UserData());
             manager.RemoveGoal(user, user.Goals[goalIndex - 1]);
         }
-
         private static void ViewGoals(List<string> goals) {
             CIO.PrintOutList(goals);
         }
 
-        private static void ViewAccounts(User user)
+        // ACCOUNTING
+        private static void SelectAccount(User user)
         {
-            List<Account> accounter = new List<Account>();
-            
-            foreach (Account account in user.Accounts)
+            bool exit = false;
+            do
             {
-                //Console.WriteLine($"Account Name:{account.AccountName}\n");
-                accounter.Add(account);  
+                // INSIDE LOOP TO REFRESH ACCOUNT LIST
+                List<string> accountList = new List<string>();
+                foreach (Account account in user.Accounts) accountList.Add(account.AccountName);
 
-            }
-            List<string> menuOptions = accounter.Select(a => a.AccountName).ToList();
-            Console.WriteLine("Select an account to view");
-            int option = CIO.PromptForMenuSelection(menuOptions, true);
+                Console.WriteLine("Select an account to view");
+                int option = CIO.PromptForMenuSelection(accountList, true);
+
+                if (option > 0)
+                {
+                    Account selectedAccount = user.Accounts[option - 1];
+                    PromptAccountOptions(selectedAccount);
+                }
+
+                exit = option == 0;
+            } while (!exit);
+        }
+        private static void PromptAccountOptions(Account account) {
+            List<string> options = [ "Deposit", "Withdraw", "Transfer", "View Account History", "Change Pin", "Rename Account", "Delete Account" ];
             
-            if (option > 0 && option <= accounter.Count)
-            {
-                Account selectedAccount = accounter[option - 1];
+            Console.WriteLine($"\nAccount Number: {account.AccountNumber}\n");
+            Console.WriteLine($"Account Name: {account.AccountName}\n");
+            Console.WriteLine($"Account Balance: {account.Balance}\n");
 
-                Console.WriteLine($"\nSelected Account Name: {selectedAccount.AccountName}\n");
-                Console.WriteLine($"Selected Account Number: {selectedAccount.AccountNumber}\n");
-                Console.WriteLine($"Selected Account Balance: {selectedAccount.Balance}\n");
-            }
-            else if (option == 0) {
-                Console.WriteLine($"Exiting\n");
-                return;
+            int choice = CIO.PromptForMenuSelection(options, false);
+
+            switch (choice)
+            {
+                case 1:
+                    // TODO: DEPOSIT
+                    break;
+                case 2:
+                    // TODO: WITHDRAW
+                    break;
+                case 3:
+                    // TODO: TRANSFER
+                    break;
+                case 4:
+                    // TODO: ACCOUNT HISTORY
+                    break;
+                case 5:
+                    // TODO: CHANGE PIN (!IMPORTANT! USES STRING NOT INT)
+                    break;
+                case 6:
+                    // TODO: RENAME ACCOUNT
+                    break;
+                case 7:
+                    // TODO: DELETE ACCOUNT (!IMPORTANT! CONFIRM WITH PIN)
+                    break;
             }
         }
     }
