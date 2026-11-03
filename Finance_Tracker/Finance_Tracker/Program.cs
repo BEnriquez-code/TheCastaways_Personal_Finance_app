@@ -243,7 +243,7 @@ namespace Finance_Tracker
         }
         private static void ViewHistory(Account account) {
 
-           int choice = CIO.PromptForMenuSelection(["View Full Transaction History", "View Income", "View Expenses"], false);
+            int choice = CIO.PromptForMenuSelection(["View Full Transaction History", "View Income", "View Expenses"], false);
 
             if (account.TransactionHistory == null)
             {
@@ -341,6 +341,7 @@ namespace Finance_Tracker
                     break;
                 case 4:
                     // TODO: ACCOUNT HISTORY
+                    ViewHistory(account);
                     break;
                 case 5:
                     // TODO: CHANGE PIN (!IMPORTANT! USES STRING NOT INT)
