@@ -340,7 +340,6 @@ namespace Finance_Tracker
                     // TODO: TRANSFER
                     break;
                 case 4:
-                    // TODO: ACCOUNT HISTORY
                     ViewHistory(account);
                     break;
                 case 5:
