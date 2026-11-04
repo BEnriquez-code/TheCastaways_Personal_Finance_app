@@ -63,16 +63,10 @@ namespace Finance_Tracker
             return true;
         }
 
-        public bool ChangePin(User user, string accountName, string currentPin, string newPin) {
-            if (string.IsNullOrWhiteSpace(newPin) || (newPin.Length >= 4 && newPin.Length <= 6)) return false;
+        public bool ChangePin(User user, string accountName, string newPin) {
 
             Account? account = user.Accounts.FirstOrDefault(a =>
                 string.Equals(a.AccountName, accountName, StringComparison.OrdinalIgnoreCase));
-            if (account == null) return false;
-
-            if (account.Pin != currentPin) return false;
-            if (newPin == currentPin) return false;
-
             string previousPin = account.Pin;
             account.Pin = newPin;
 
@@ -93,8 +87,8 @@ namespace Finance_Tracker
            if (account == null) return false;
 
             bool nameTaken = user.Accounts.Any(a =>
-                 !ReferenceEquals(a, account) &&
-                 string.Equals(a.AccountName, newName, StringComparison.OrdinalIgnoreCase));
+                !ReferenceEquals(a, account) &&
+                string.Equals(a.AccountName, newName, StringComparison.OrdinalIgnoreCase));
             if (nameTaken) return false;
 
             string previousName = account.AccountName;

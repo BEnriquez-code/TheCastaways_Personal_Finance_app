@@ -441,10 +441,10 @@ namespace Finance_Tracker
                     TransferToAccount(user, account);
                     break;
                 case 4:
-                    // TODO: ACCOUNT HISTORY
+                    ViewHistory(account);
                     break;
                 case 5:
-                    // TODO: CHANGE PIN (!IMPORTANT! USES STRING NOT INT)
+                    PromptChangePIN(account, user);
                     break;
                 case 6:
                     // RENAME ACCOUNT
@@ -462,6 +462,35 @@ namespace Finance_Tracker
                     PromptAccountDeletion(user, account);
                     break;
             }
+        }
+        private static void PromptChangePIN(Account account, User user)
+        {
+            bool saved = false;
+            Manager manager = new Manager(new UserData());
+            do{
+                string currPin = CIO.PromptForString("Please enter in your PIN:\n" , false);
+                if(currPin != account.Pin)
+                {
+                    Console.WriteLine("Invalid PIN! Returning to Menu.\n");
+                    return;
+                }
+
+                string newPin = CIO.PromptForString("Please enter your new PIN:\n" , false);
+                if(newPin.Length != 4 || !newPin.All(char.IsDigit))
+                {
+                    Console.WriteLine("PIN is either not four digits long or does not contain all digits. Returning to Menu.\n");
+                    return;
+                }
+
+                saved = manager.ChangePin(user, account.AccountName, newPin);
+                if (saved)
+                {
+                    Console.WriteLine("New PIN has been saved!");
+                } else {
+                    Console.WriteLine("There was an error saving your new PIN.");
+                }
+                break;
+            } while (true);
         }
     }
 }
