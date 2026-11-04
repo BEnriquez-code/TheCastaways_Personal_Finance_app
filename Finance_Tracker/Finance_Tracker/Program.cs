@@ -354,7 +354,7 @@ namespace Finance_Tracker
                     break;
                 case 3:
                     // TODO: TRANSFER
-              
+                    PromptForTransferAccount(user, account);
                     break;
                 case 4:
                     // TODO: ACCOUNT HISTORY
@@ -377,6 +377,7 @@ namespace Finance_Tracker
             Account? account2 = new Account();
             List<string> accountList = new List<string>();
             foreach (Account accounts in user.Accounts) accountList.Add(accounts.AccountName);
+
             bool validInput = false;
             string? account2Name;
             List<string> options = ["Enter account name"];
