@@ -6,7 +6,8 @@ namespace Finance_Tracker
     public class Program
     {
         private static UserData userDataService = new UserData();
-        // MAIN LOOP
+
+        // MAIN LOOPS
         public static void Main(string[] args)
         {
             BootUpLoop();
@@ -206,7 +207,6 @@ namespace Finance_Tracker
                 Console.WriteLine("\nAccount not created.\n");
             }
         }
-
         private static void PromptAccountDeletion(User user, Account account) {
             string? pin = CIO.PromptForString("\nInsert pin to confirm account deletion:", true);
             bool accountDeleted = false;
@@ -237,6 +237,68 @@ namespace Finance_Tracker
         }
 
         // FINANCE HANDLING
+        private static void TransferToAccount(User user, Account sender)
+        {
+            Account? reciever = new Account();
+            List<string> accountList = new List<string>();
+            foreach (Account accounts in user.Accounts) accountList.Add(accounts.AccountName);
+
+            bool validInput = false;
+            string? account2Name;
+            List<string> options = ["Enter account name"];
+
+            int selection =  CIO.PromptForMenuSelection(options, true);
+            if (selection == 0)
+            {
+                return;
+            }
+            else
+            {
+                do
+                {
+                    do
+                    {
+                        // Ask for account name to transfer to
+                        account2Name = CIO.PromptForString("Enter the name of the account you wish to transfer into: ", false);
+
+                        // Check that it isn't the current account
+                        if (account2Name == sender.AccountName)
+                        {
+                            Console.WriteLine("You cannot transfer to the account you are in.");
+                        }
+                        else
+                        {
+                            validInput = true;
+                        }
+                    } while (validInput == false);
+
+                    validInput = false;
+
+                    for (int i = 0; i < accountList.Count(); i++)
+                    {
+                        for (int j = 0; j < user.Accounts.Count(); j++)
+                        {
+                            if (accountList[i] == user.Accounts[j].AccountName)
+                            {
+                                reciever = user.Accounts[j];
+                                validInput = true;
+                                break;
+                            }
+                            else if (i == accountList.Count() && j == user.Accounts.Count() && accountList[i] != user.Accounts[j].AccountName)
+                            {
+                                Console.WriteLine($"Could not find {account2Name} in accounts! Please try again.");
+                                validInput = false;
+                            }
+                        }
+                    }
+
+                } while (validInput == false);
+
+                Transactions.Transfer(sender, reciever);
+            }
+
+            return;
+        }
         private static void Withdraw(Account account)
         {
             if (account.TransactionHistory == null)
@@ -376,7 +438,7 @@ namespace Finance_Tracker
                     break;
                 case 3:
                     // TODO: TRANSFER
-                    PromptForTransferAccount(user, account);
+                    TransferToAccount(user, account);
                     break;
                 case 4:
                     // TODO: ACCOUNT HISTORY
@@ -401,71 +463,6 @@ namespace Finance_Tracker
                     break;
             }
         }
-
-
-        private static void PromptForTransferAccount(User user, Account account1)
-        {
-            Account? account2 = new Account();
-            List<string> accountList = new List<string>();
-            foreach (Account accounts in user.Accounts) accountList.Add(accounts.AccountName);
-
-            bool validInput = false;
-            string? account2Name;
-            List<string> options = ["Enter account name"];
-
-            int selection =  CIO.PromptForMenuSelection(options, true);
-            if (selection == 0)
-            {
-                return;
-            }
-            else
-            {
-                do
-                {
-                    do
-                    {
-                        // Ask for account name to transfer to
-                        account2Name = CIO.PromptForString("Enter the name of the account you wish to transfer into: ", false);
-
-                        // Check that it isn't the current account
-                        if (account2Name == account1.AccountName)
-                        {
-                            Console.WriteLine("You cannot transfer to the account you are in.");
-                        }
-                        else
-                        {
-                            validInput = true;
-                        }
-                    } while (validInput == false);
-
-                    validInput = false;
-
-                    for (int i = 0; i < accountList.Count(); i++)
-                    {
-                        for (int j = 0; j < user.Accounts.Count(); j++)
-                        {
-                            if (accountList[i] == user.Accounts[j].AccountName)
-                            {
-                                account2 = user.Accounts[j];
-                                validInput = true;
-                                break;
-                            }
-                            else if (i == accountList.Count() && j == user.Accounts.Count() && accountList[i] != user.Accounts[j].AccountName)
-                            {
-                                Console.WriteLine($"Could not find {account2Name} in accounts! Please try again.");
-                                validInput = false;
-                            }
-                        }
-                    }
-
-                } while (validInput == false);
-
-                Transactions.Transfer(account1, account2);
-            }
-
-            return;
-        }
     }
-
 }
 
