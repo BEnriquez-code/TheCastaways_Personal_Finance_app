@@ -5,13 +5,13 @@ namespace Finance_Tracker
 {
     public class Program
     {
+        private static UserData userDataService = new UserData();
         // MAIN LOOP
         public static void Main(string[] args)
         {
           BootUpLoop();
         }
         private static void BootUpLoop() {
-            var userDataService = new UserData();
             var auth = new Authentication(userDataService);
             User? user = null;
 
@@ -27,7 +27,7 @@ namespace Finance_Tracker
                             int age = PromptAge();
                             if (age >= 16)
                             {
-                                PromptRegistration(age, auth, userDataService);
+                                PromptRegistration(age, auth);
                             }
                             else
                             {
@@ -37,7 +37,7 @@ namespace Finance_Tracker
                         ;
                         break;
                     case 2:
-                        user = PromptLogin(auth, userDataService);
+                        user = PromptLogin(auth);
                         break;
                     case 0:
                         exit = true;
@@ -45,13 +45,13 @@ namespace Finance_Tracker
                 }
 
                 if (user != null) {
-                    FinancialTrackerLoop(user, userDataService);
+                    FinancialTrackerLoop(user);
                     user = null;
                 }
 
             } while (!exit);
         }
-        private static void FinancialTrackerLoop(User user, UserData userDataService) {
+        private static void FinancialTrackerLoop(User user) {
             string[] options = ["Create New Account", "View Accounts", "View Goals", "Set New Goal", "Remove Goal"];
             bool logout = false;
             do {
@@ -62,7 +62,7 @@ namespace Finance_Tracker
                 switch (option)
                 {
                     case 1:
-                        PromptAccountCreation(user, userDataService);
+                        PromptAccountCreation(user);
                         break;
                     case 2:
                         SelectAccount(user);
@@ -87,7 +87,7 @@ namespace Finance_Tracker
         // HELPER METHODS
 
         // ACCOUNT/USER PROMPTING
-        private static void PromptRegistration(int age, Authentication auth, UserData userDataService)
+        private static void PromptRegistration(int age, Authentication auth)
         {
             string username = "";
             string password = "";
@@ -139,7 +139,7 @@ namespace Finance_Tracker
 
             Console.WriteLine($"User {username} create: {isUserCreated}");
         }
-        private static User? PromptLogin(Authentication auth, UserData userDataService)
+        private static User? PromptLogin(Authentication auth)
         {
             string username = "";
             bool usernameFound = false;
@@ -170,7 +170,7 @@ namespace Finance_Tracker
 
             return user;
         }
-        private static void PromptAccountCreation(User user, UserData userDataService) {
+        private static void PromptAccountCreation(User user) {
             Manager manager = new Manager(userDataService);
             Console.WriteLine("\nAccount Creation:\n");
 
@@ -196,6 +196,30 @@ namespace Finance_Tracker
             else {
                 Console.WriteLine("\nAccount not created.\n");
             }
+        }
+        private static void PromptAccountDeletion(User user, Account account) {
+            string? pin = CIO.PromptForString("\nInsert pin to confirm account deletion:", true);
+            bool accountDeleted = false;
+            if (pin == account.Pin)
+            {
+                Console.WriteLine("\nDeleting Account...\n");
+                Manager manager = new Manager(userDataService);
+                accountDeleted = manager.RemoveAccount(user, account.AccountName);
+            }
+            else
+            {
+                Console.WriteLine("\nIncorrect PIN.");
+            }
+
+            if (accountDeleted)
+            {
+                Console.WriteLine("Account Deletion Confirmed.\n");
+            }
+            else
+            {
+                Console.WriteLine("Account Deletion Denied.\n");
+            }
+
         }
         private static int PromptAge() {
             return CIO.PromptForInt("Insert your age: ", 1, int.MaxValue);
@@ -313,13 +337,14 @@ namespace Finance_Tracker
                 if (option > 0)
                 {
                     Account selectedAccount = user.Accounts[option - 1];
-                    PromptAccountOptions(selectedAccount);
+                    PromptAccountOptions(user, selectedAccount);
                 }
 
                 exit = option == 0;
             } while (!exit);
         }
-        private static void PromptAccountOptions(Account account) {
+        private static void PromptAccountOptions(User user, Account account) {
+            Manager manager = new Manager(userDataService);
             List<string> options = [ "Deposit", "Withdraw", "Transfer", "View Account History", "Change Pin", "Rename Account", "Delete Account" ];
             
             Console.WriteLine($"\nAccount Number: {account.AccountNumber}\n");
@@ -346,10 +371,19 @@ namespace Finance_Tracker
                     // TODO: CHANGE PIN (!IMPORTANT! USES STRING NOT INT)
                     break;
                 case 6:
-                    // TODO: RENAME ACCOUNT
+                    // RENAME ACCOUNT
+                    string newName = CIO.PromptForString("Rename Your Account: ", false);
+                    if (manager.RenameAccount(user, account, newName))
+                    {
+                        Console.WriteLine($"Account renamed to: {account.AccountName}");
+                    }
+                    else {
+                        Console.WriteLine("Account was unable to be renamed.");
+                    }
                     break;
                 case 7:
-                    // TODO: DELETE ACCOUNT (!IMPORTANT! CONFIRM WITH PIN)
+                    // DELETE ACCOUNT (!IMPORTANT! CONFIRM WITH PIN)
+                    PromptAccountDeletion(user, account);
                     break;
             }
         }
