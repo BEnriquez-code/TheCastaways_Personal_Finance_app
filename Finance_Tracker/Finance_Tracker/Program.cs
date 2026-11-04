@@ -91,7 +91,7 @@ namespace Finance_Tracker
 
         // HELPER METHODS
 
-        // ACCOUNT/USER PROMPTING
+        #region ACCOUNT / USER PROMPTING
         private static void PromptRegistration(int age, Authentication auth)
         {
             string username = "";
@@ -231,12 +231,45 @@ namespace Finance_Tracker
             }
 
         }
+        private static void PromptChangePIN(Account account, User user)
+        {
+            bool saved = false;
+            Manager manager = new Manager(new UserData());
+            do
+            {
+                string currPin = CIO.PromptForString("Please enter in your PIN:\n", false);
+                if (currPin != account.Pin)
+                {
+                    Console.WriteLine("Invalid PIN! Returning to Menu.\n");
+                    return;
+                }
+
+                string newPin = CIO.PromptForString("Please enter your new PIN:\n", false);
+                if (newPin.Length != 4 || !newPin.All(char.IsDigit))
+                {
+                    Console.WriteLine("PIN is either not four digits long or does not contain all digits. Returning to Menu.\n");
+                    return;
+                }
+
+                saved = manager.ChangePin(user, account.AccountName, newPin);
+                if (saved)
+                {
+                    Console.WriteLine("Pin changed.");
+                }
+                else
+                {
+                    Console.WriteLine("Unable to save Pin.");
+                }
+                break;
+            } while (true);
+        }
         private static int PromptAge()
         {
             return CIO.PromptForInt("Insert your age: ", 1, int.MaxValue);
         }
+        #endregion
 
-        // FINANCE HANDLING
+        #region FINANCE HANDLING
         private static void TransferToAccount(User user, Account sender)
         {
             Account? reciever = new Account();
@@ -363,8 +396,9 @@ namespace Finance_Tracker
 
             Console.WriteLine($"Current balance is: ${account.Balance}");
         }
+        #endregion
 
-        // GOAL PROMPTING
+        #region GOAL PROMPTING
         private static void PromptAddGoal(User user)
         {
             string goal = CIO.PromptForString("What goal do you want to accomplish?: ", false);
@@ -392,8 +426,9 @@ namespace Finance_Tracker
         {
             CIO.PrintOutList(goals);
         }
+        #endregion
 
-        // ACCOUNTING
+        #region ACCOUNTING
         private static void SelectAccount(User user)
         {
             bool exit = false;
@@ -463,35 +498,8 @@ namespace Finance_Tracker
                     break;
             }
         }
-        private static void PromptChangePIN(Account account, User user)
-        {
-            bool saved = false;
-            Manager manager = new Manager(new UserData());
-            do{
-                string currPin = CIO.PromptForString("Please enter in your PIN:\n" , false);
-                if(currPin != account.Pin)
-                {
-                    Console.WriteLine("Invalid PIN! Returning to Menu.\n");
-                    return;
-                }
+        #endregion
 
-                string newPin = CIO.PromptForString("Please enter your new PIN:\n" , false);
-                if(newPin.Length != 4 || !newPin.All(char.IsDigit))
-                {
-                    Console.WriteLine("PIN is either not four digits long or does not contain all digits. Returning to Menu.\n");
-                    return;
-                }
-
-                saved = manager.ChangePin(user, account.AccountName, newPin);
-                if (saved)
-                {
-                    Console.WriteLine("New PIN has been saved!");
-                } else {
-                    Console.WriteLine("There was an error saving your new PIN.");
-                }
-                break;
-            } while (true);
-        }
     }
 }
 
