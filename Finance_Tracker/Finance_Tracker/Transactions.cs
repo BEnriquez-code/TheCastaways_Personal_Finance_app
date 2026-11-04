@@ -98,8 +98,6 @@ namespace Finance_Tracker
             {
                 Console.WriteLine($"The transaction couldn't be made");
             }
-       
-        
         
         }
 

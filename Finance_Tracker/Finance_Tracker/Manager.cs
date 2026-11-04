@@ -63,16 +63,10 @@ namespace Finance_Tracker
             return true;
         }
 
-        public bool ChangePin(User user, string accountName, string currentPin, string newPin) {
-            if (string.IsNullOrWhiteSpace(newPin) || (newPin.Length >= 4 && newPin.Length <= 6)) return false;
+        public bool ChangePin(User user, string accountName, string newPin) {
 
             Account? account = user.Accounts.FirstOrDefault(a =>
                 string.Equals(a.AccountName, accountName, StringComparison.OrdinalIgnoreCase));
-            if (account == null) return false;
-
-            if (account.Pin != currentPin) return false;
-            if (newPin == currentPin) return false;
-
             string previousPin = account.Pin;
             account.Pin = newPin;
 
@@ -84,21 +78,22 @@ namespace Finance_Tracker
             return true;
         }
 
-        public bool RenameAccount(User user, string oldAccountName, string newAccountName ) {
+        public bool RenameAccount(User user, Account selectedAccount, string newAccountName ) {
            string newName = newAccountName.Trim() ?? "";
            if (newName.Length == 0) return false;
 
            Account? account = user.Accounts.FirstOrDefault(a =>
-               string.Equals(a.AccountName, oldAccountName, StringComparison.OrdinalIgnoreCase));
+               string.Equals(a.AccountName, selectedAccount.AccountName, StringComparison.OrdinalIgnoreCase));
            if (account == null) return false;
 
             bool nameTaken = user.Accounts.Any(a =>
-                 !ReferenceEquals(a, account) &&
-                 string.Equals(a.AccountName, newName, StringComparison.OrdinalIgnoreCase));
+                !ReferenceEquals(a, account) &&
+                string.Equals(a.AccountName, newName, StringComparison.OrdinalIgnoreCase));
             if (nameTaken) return false;
 
             string previousName = account.AccountName;
             account.AccountName = newName;
+            selectedAccount.AccountName = newName;
 
             if (!SaveUserChanges(user)) {
                 account.AccountName = previousName;
