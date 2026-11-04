@@ -8,9 +8,10 @@ namespace Finance_Tracker
         // MAIN LOOP
         public static void Main(string[] args)
         {
-          BootUpLoop();
+            BootUpLoop();
         }
-        private static void BootUpLoop() {
+        private static void BootUpLoop()
+        {
             var userDataService = new UserData();
             var auth = new Authentication(userDataService);
             User? user = null;
@@ -44,17 +45,20 @@ namespace Finance_Tracker
                         break;
                 }
 
-                if (user != null) {
+                if (user != null)
+                {
                     FinancialTrackerLoop(user, userDataService);
                     user = null;
                 }
 
             } while (!exit);
         }
-        private static void FinancialTrackerLoop(User user, UserData userDataService) {
+        private static void FinancialTrackerLoop(User user, UserData userDataService)
+        {
             string[] options = ["Create New Account", "View Accounts", "View Goals", "Set New Goal", "Remove Goal"];
             bool logout = false;
-            do {
+            do
+            {
                 Console.WriteLine($"\n\nWelcome, {user.UserName}\n\n");
 
                 int option = CIO.PromptForMenuSelection(options, true);
@@ -94,19 +98,22 @@ namespace Finance_Tracker
             bool isInvalidUsername = true;
             bool isInvalidPassword = true;
 
-            do {
+            do
+            {
                 username = CIO.PromptForString("Choose a username: ", false);
 
                 isInvalidUsername = userDataService.UserExists(username);
 
-                if (isInvalidUsername) {
+                if (isInvalidUsername)
+                {
                     Console.WriteLine("That username has been taken");
                 }
 
             } while (isInvalidUsername);
 
-            do {
-                
+            do
+            {
+
 
                 password = CIO.PromptForString("Choose a password: ", false);
 
@@ -128,7 +135,7 @@ namespace Finance_Tracker
 
                 isInvalidPassword = !isValidChars || !passwordsMatch;
 
-                if (isInvalidPassword) 
+                if (isInvalidPassword)
                 {
                     Console.WriteLine("Could not create new user. Please try again");
                 }
@@ -162,7 +169,8 @@ namespace Finance_Tracker
 
                 user = auth.LogIn(username, password);
 
-                if (user == null) {
+                if (user == null)
+                {
                     Console.WriteLine("This password does not match to account");
                 }
 
@@ -170,7 +178,8 @@ namespace Finance_Tracker
 
             return user;
         }
-        private static void PromptAccountCreation(User user, UserData userDataService) {
+        private static void PromptAccountCreation(User user, UserData userDataService)
+        {
             Manager manager = new Manager(userDataService);
             Console.WriteLine("\nAccount Creation:\n");
 
@@ -179,11 +188,13 @@ namespace Finance_Tracker
             string? pin = "";
 
             bool invalidPin = true;
-            do {
+            do
+            {
                 pin = CIO.PromptForString("Create a Four Digit PIN:", false);
                 invalidPin = pin.Length != 4 || !pin.All(char.IsDigit);
 
-                if (invalidPin) {
+                if (invalidPin)
+                {
                     Console.WriteLine("PIN is either not four digits long or does not contain all digits\n");
                 }
 
@@ -193,28 +204,32 @@ namespace Finance_Tracker
             {
                 Console.WriteLine($"\nAccount \"{accountName}\" was created.\n");
             }
-            else {
+            else
+            {
                 Console.WriteLine("\nAccount not created.\n");
             }
         }
-        private static int PromptAge() {
+        private static int PromptAge()
+        {
             return CIO.PromptForInt("Insert your age: ", 1, int.MaxValue);
         }
 
 
         // FINANCE HANDLING
-        private static void Withdraw(Account account) { 
+        private static void Withdraw(Account account)
+        {
             if (account.TransactionHistory == null)
             {
                 account.TransactionHistory = new List<string>();
                 Transactions.Withdraw(account);
-            } else
+            }
+            else
             {
                 Transactions.Withdraw(account);
             }
-            Console.WriteLine($"Current balance is: ${account.Balance}");
         }
-        private static void Deposit(Account account) {
+        private static void Deposit(Account account)
+        {
             if (account.TransactionHistory == null)
             {
                 account.TransactionHistory = new List<string>();
@@ -224,8 +239,6 @@ namespace Finance_Tracker
             {
                 Transactions.Deposit(account);
             }
-
-            Console.WriteLine($"Current balance is: ${account.Balance}");
         }
         private static void Deposit(Account account, int amount)
         {
@@ -238,12 +251,11 @@ namespace Finance_Tracker
             {
                 account.TransactionHistory.Add($"+{amount}");
             }
-
-            Console.WriteLine($"Current balance is: ${account.Balance}");
         }
-        private static void ViewHistory(Account account) {
+        private static void ViewHistory(Account account)
+        {
 
-           int choice = CIO.PromptForMenuSelection(["View Full Transaction History", "View Income", "View Expenses"], false);
+            int choice = CIO.PromptForMenuSelection(["View Full Transaction History", "View Income", "View Expenses"], false);
 
             if (account.TransactionHistory == null)
             {
@@ -264,7 +276,7 @@ namespace Finance_Tracker
                 default:
                     return;
             }
-            
+
 
             Console.WriteLine($"Current balance is: ${account.Balance}");
         }
@@ -281,7 +293,7 @@ namespace Finance_Tracker
         }
         private static void RemoveGoal(User user)
         {
-            if(user.Goals == null || user.Goals.Count == 0)
+            if (user.Goals == null || user.Goals.Count == 0)
             {
                 Console.WriteLine("You have no goals to remove.");
                 return;
@@ -293,7 +305,8 @@ namespace Finance_Tracker
             Manager manager = new Manager(new UserData());
             manager.RemoveGoal(user, user.Goals[goalIndex - 1]);
         }
-        private static void ViewGoals(List<string> goals) {
+        private static void ViewGoals(List<string> goals)
+        {
             CIO.PrintOutList(goals);
         }
 
@@ -319,9 +332,10 @@ namespace Finance_Tracker
                 exit = option == 0;
             } while (!exit);
         }
-        private static void PromptAccountOptions(Account account) {
-            List<string> options = [ "Deposit", "Withdraw", "Transfer", "View Account History", "Change Pin", "Rename Account", "Delete Account" ];
-            
+        private static void PromptAccountOptions(User user, Account account)
+        {
+            List<string> options = ["Deposit", "Withdraw", "Transfer", "View Account History", "Change Pin", "Rename Account", "Delete Account"];
+
             Console.WriteLine($"\nAccount Number: {account.AccountNumber}\n");
             Console.WriteLine($"Account Name: {account.AccountName}\n");
             Console.WriteLine($"Account Balance: {account.Balance}\n");
@@ -332,12 +346,15 @@ namespace Finance_Tracker
             {
                 case 1:
                     // TODO: DEPOSIT
+                    Deposit(account);
                     break;
                 case 2:
                     // TODO: WITHDRAW
+                    Withdraw(account);
                     break;
                 case 3:
                     // TODO: TRANSFER
+              
                     break;
                 case 4:
                     // TODO: ACCOUNT HISTORY
@@ -353,5 +370,70 @@ namespace Finance_Tracker
                     break;
             }
         }
+
+
+        private static void PromptForTransferAccount(User user, Account account1)
+        {
+            Account? account2 = new Account();
+            List<string> accountList = new List<string>();
+            foreach (Account accounts in user.Accounts) accountList.Add(accounts.AccountName);
+            bool validInput = false;
+            string? account2Name;
+            List<string> options = ["Enter account name"];
+
+            int selection =  CIO.PromptForMenuSelection(options, true);
+            if (selection == 0)
+            {
+                return;
+            }
+            else
+            {
+                do
+                {
+                    do
+                    {
+                        // Ask for account name to transfer to
+                        account2Name = CIO.PromptForString("Enter the name of the account you wish to transfer into: ", false);
+
+                        // Check that it isn't the current account
+                        if (account2Name == account1.AccountName)
+                        {
+                            Console.WriteLine("You cannot transfer to the account you are in.");
+                        }
+                        else
+                        {
+                            validInput = true;
+                        }
+                    } while (validInput == false);
+
+                    validInput = false;
+
+                    for (int i = 0; i < accountList.Count(); i++)
+                    {
+                        for (int j = 0; j < user.Accounts.Count(); j++)
+                        {
+                            if (accountList[i] == user.Accounts[j].AccountName)
+                            {
+                                account2 = user.Accounts[j];
+                                validInput = true;
+                                break;
+                            }
+                            else if (i == accountList.Count() && j == user.Accounts.Count() && accountList[i] != user.Accounts[j].AccountName)
+                            {
+                                Console.WriteLine($"Could not find {account2Name} in accounts! Please try again.");
+                                validInput = false;
+                            }
+                        }
+                    }
+
+                } while (validInput == false);
+
+                Transactions.Transfer(account1, account2);
+            }
+
+            return;
+        }
     }
+
 }
+
